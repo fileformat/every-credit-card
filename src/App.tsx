@@ -3,6 +3,9 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 
 import AboutDialog from './AboutDialog'
 import './App.css'
+import { GetCardInfo } from './lib/GetCardInfo'
+import { GetName } from './lib/GetName'
+import { SeededRandom } from './lib/SeededRandom'
 
 const subtitles = [
   "PCI Audit: Fail",
@@ -11,6 +14,18 @@ const subtitles = [
   "Does the security team know about this?",
   "All your cards are belong to us",
 ]
+
+const pad = (value: number, width: number): string => value.toString().padStart(width, '0');
+
+const getCvv = (random: ReturnType<typeof SeededRandom>): string => pad(random.nextInt(0, 999), 3);
+
+const getZip = (random: ReturnType<typeof SeededRandom>): string => pad(random.nextInt(0, 99999), 5);
+
+const getExpires = (random: ReturnType<typeof SeededRandom>): string => {
+  const month = pad(random.nextInt(1, 12), 2);
+  const year = random.nextInt(26, 36);
+  return `${month}/${year}`;
+};
 
 function App() {
   const [debug, setDebug] = useQueryState('debug', parseAsBoolean.withDefault(false));
@@ -104,24 +119,40 @@ function App() {
               <thead>
                 <tr>
                   {debug && <th>Debug</th>}
-                  <th>Card Number</th>
-                  <th>CVV</th>
-                  <th>Expires</th>
-                  <th>Name</th>
-                  <th>Zip</th>
+                  <th style={{ width: '4em' }}></th>
+                  <th style={{ width: '18em' }}>Card Number</th>
+                  <th style={{ width: '6em' }}>CVV</th>
+                  <th style={{ width: '7em' }}>Expires</th>
+                  <th style={{ width: '26em' }}>Name</th>
+                  <th style={{ width: '7em' }}>Zip</th>
                 </tr>
               </thead>
               <tbody>
                 {Array.from({ length: visibleCount }, (_, i) => {
                   const row = logicalRow + i;
+                  const random = SeededRandom(row);
+                  const cardInfo = GetCardInfo(random);
+                  const cvv = getCvv(random);
+                  const zip = getZip(random);
+                  const expires = getExpires(random);
+                  const name = GetName(random);
+
                   return (
                     <tr key={row} style={{ height: ROW_HEIGHT }}>
                       {debug && <td>{Intl.NumberFormat().format(row + 1)}</td>}
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                      <td>
+                        <img
+                          src={cardInfo.imageUrl}
+                          alt={cardInfo.cardType}
+                          className="h-5 w-auto"
+                          loading="lazy"
+                        />
+                      </td>
+                      <td>{cardInfo.number}</td>
+                      <td>{cvv}</td>
+                      <td>{expires}</td>
+                      <td>{name}</td>
+                      <td>{zip}</td>
                     </tr>
                   );
                 })}
