@@ -48,15 +48,15 @@ const luhnCheckDigit = (payload: string): number => {
 
 const formatNumber = (digits: string): string => {
   if (digits.length === 15) {
-    return `${digits.slice(0, 4)} ${digits.slice(4, 10)} ${digits.slice(10, 15)}`;
+    return `${digits.slice(0, 4)}\u00A0${digits.slice(4, 10)}\u00A0${digits.slice(10, 15)}`;
   }
 
   if (digits.length === 14) {
-    return `${digits.slice(0, 4)} ${digits.slice(4, 10)} ${digits.slice(10, 14)}`;
+    return `${digits.slice(0, 4)}\u00A0${digits.slice(4, 10)}\u00A0${digits.slice(10, 14)}`;
   }
 
   const groups = digits.match(/.{1,4}/g);
-  return groups ? groups.join(" ") : digits;
+  return groups ? groups.join("\u00A0") : digits;
 };
 
 function GetCardInfo(random: RandomGenerator): CardInfo {

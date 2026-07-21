@@ -4,6 +4,7 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import AboutDialog from './AboutDialog'
 import './App.css'
 import { GetCardInfo } from './lib/GetCardInfo'
+import type { CardType } from './lib/GetCardInfo'
 import { GetName } from './lib/GetName'
 import { SeededRandom } from './lib/SeededRandom'
 
@@ -17,7 +18,13 @@ const subtitles = [
 
 const pad = (value: number, width: number): string => value.toString().padStart(width, '0');
 
-const getCvv = (random: ReturnType<typeof SeededRandom>): string => pad(random.nextInt(0, 999), 3);
+const getCvv = (random: ReturnType<typeof SeededRandom>, cardType: CardType): string => {
+  if (cardType === 'amex') {
+    return pad(random.nextInt(0, 9999), 4);
+  }
+
+  return pad(random.nextInt(0, 999), 3);
+};
 
 const getZip = (random: ReturnType<typeof SeededRandom>): string => pad(random.nextInt(0, 99999), 5);
 
@@ -96,7 +103,9 @@ function App() {
             <label htmlFor="navbar-1-toggle" className="btn btn-ghost lg:hidden">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
             </label>
-            <button className="btn btn-ghost text-3xl">Every Credit Card</button>
+            <span className="text-3xl font-bold">
+              <img className="inline-block h-8 w-auto px-2" src="/logo.svg" alt="Every Credit Card Logo" />
+              Every Credit Card</span>
             <div className="ms-3 mt-1 text-lg xfont-light cursor-pointer" onClick={() => setSubtitleIndex(Math.floor(Math.random() * subtitles.length))}>{subtitles[subtitleIndex]}</div>
           </div>
           {debug && <div className="navbar-center">
@@ -119,7 +128,7 @@ function App() {
               <thead>
                 <tr>
                   {debug && <th>Debug</th>}
-                  <th style={{ width: '4em' }}></th>
+                  <th className="text-center" style={{ width: '6em' }}></th>
                   <th style={{ width: '18em' }}>Card Number</th>
                   <th style={{ width: '6em' }}>CVV</th>
                   <th style={{ width: '7em' }}>Expires</th>
@@ -132,7 +141,7 @@ function App() {
                   const row = logicalRow + i;
                   const random = SeededRandom(row);
                   const cardInfo = GetCardInfo(random);
-                  const cvv = getCvv(random);
+                  const cvv = getCvv(random, cardInfo.cardType);
                   const zip = getZip(random);
                   const expires = getExpires(random);
                   const name = GetName(random);
@@ -140,12 +149,11 @@ function App() {
                   return (
                     <tr key={row} style={{ height: ROW_HEIGHT }}>
                       {debug && <td>{Intl.NumberFormat().format(row + 1)}</td>}
-                      <td>
+                      <td className="text-center text-nowrap py-0">
                         <img
                           src={cardInfo.imageUrl}
                           alt={cardInfo.cardType}
-                          className="h-5 w-auto"
-                          loading="lazy"
+                          className="inline-block h-6 w-auto"
                         />
                       </td>
                       <td>{cardInfo.number}</td>
