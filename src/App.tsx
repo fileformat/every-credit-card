@@ -12,9 +12,14 @@ const subtitles = [
   "PCI Audit: Fail",
   "Even yours!",
   "Well, only the unexpired ones",
-  "Does the security team know about this?",
-  "All your cards are belong to us",
-]
+  "Does the security team know?",
+  "All your card are belong to us",
+  "Unmasked!",
+  "Don't spend it all at once",
+  "Because that's where the money is",
+  "Buy now, pay never",
+  "With no fine print!",
+];
 
 const pad = (value: number, width: number): string => value.toString().padStart(width, '0');
 
@@ -40,7 +45,7 @@ function App() {
 
   const [subtitleIndex, setSubtitleIndex] = useState(Math.floor(Math.random() * subtitles.length))
 
-  const TOTAL_ROWS = 10_000_000_000;
+  const TOTAL_ROWS = 1_000_000_000_000_000;
   const ROW_HEIGHT = 48;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -96,22 +101,17 @@ function App() {
   return (
     <>
       <div className="max-lg:collapse bg-base-200 shadow-sm w-full">
-        <input id="navbar-1-toggle" className="peer hidden" type="checkbox" />
-        <label htmlFor="navbar-1-toggle" className="fixed inset-0 hidden max-lg:peer-checked:block"></label>
-        <div className="collapse-title navbar">
-          <div className="navbar-start">
-            <label htmlFor="navbar-1-toggle" className="btn btn-ghost lg:hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
-            </label>
+        <div className="navbar flex justify-between border-b border-base-300">
+          <div className="">
             <span className="text-3xl font-bold">
               <img className="inline-block h-8 w-auto px-2" src="/logo.svg" alt="Every Credit Card Logo" />
               Every Credit Card</span>
-            <div className="ms-3 mt-1 text-lg xfont-light cursor-pointer" onClick={() => setSubtitleIndex(Math.floor(Math.random() * subtitles.length))}>{subtitles[subtitleIndex]}</div>
+            <span className="ms-3 mt-1 text-xl font-light cursor-pointer" onClick={() => setSubtitleIndex(Math.floor(Math.random() * subtitles.length))}>{subtitles[subtitleIndex]}</span>
           </div>
-          {debug && <div className="navbar-center">
+          {debug && <div className="">
             <span>Debug pos={logicalRow} vis={visibleCount}</span>
           </div>}
-          <div className="navbar-end">
+          <div className="">
             <button
               type="button"
               className="btn btn-ghost btn-circle me-3"
