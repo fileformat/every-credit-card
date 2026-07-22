@@ -100,7 +100,7 @@ function App() {
 
   return (
     <>
-      <div className="max-lg:collapse bg-base-200 shadow-sm w-full">
+      <div className="max-lg:collapse bg-base-200 shadow-sm w-full flex flex-col h-screen">
         <div className="navbar flex justify-between border-b border-base-300">
           <div className="">
             <span className="text-3xl font-bold">
@@ -122,12 +122,12 @@ function App() {
             </button>        
           </div>
         </div>
-        <div className="flex" style={{ height: 'calc(100vh - 120px)' }}>
+        <div className="flex flex-1 min-h-0">
           <div ref={containerRef} className="flex-1 overflow-hidden">
             <table className="table w-full" onWheel={handleWheel}>
               <thead>
                 <tr>
-                  {debug && <th>Debug</th>}
+                  {debug && <th style={{ width: '18em' }}>Debug</th>}
                   <th className="text-center" style={{ width: '6em' }}></th>
                   <th style={{ width: '18em' }}>Card Number</th>
                   <th style={{ width: '6em' }}>CVV</th>
@@ -140,11 +140,11 @@ function App() {
                 {Array.from({ length: visibleCount }, (_, i) => {
                   const row = logicalRow + i;
                   const random = SeededRandom(row);
+                  const name = GetName(random);
                   const cardInfo = GetCardInfo(random);
                   const cvv = getCvv(random, cardInfo.cardType);
                   const zip = getZip(random);
                   const expires = getExpires(random);
-                  const name = GetName(random);
 
                   return (
                     <tr key={row} style={{ height: ROW_HEIGHT }}>
@@ -152,7 +152,8 @@ function App() {
                       <td className="text-center text-nowrap py-0">
                         <img
                           src={cardInfo.imageUrl}
-                          alt={cardInfo.cardType}
+                          title={cardInfo.cardBrand}
+                          alt={cardInfo.cardBrand}
                           className="inline-block h-6 w-auto"
                         />
                       </td>

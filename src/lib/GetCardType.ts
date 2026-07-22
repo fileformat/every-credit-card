@@ -1,7 +1,10 @@
 import type { RandomGenerator } from "./SeededRandom";
 
+type CardBrand = "amex" | "dinersclub" | "discover" | "jcb" | "mastercard" | "unionpay" | "visa";
+
+
 type CardType = {
-    brand: string;
+    brand: CardBrand;
     prefix: string;
     length: number;
 }
@@ -42,4 +45,4 @@ function GetCardType(rng: RandomGenerator): CardType {
 }
 
 
-export { GetCardType, type CardType };
+export { GetCardType, type CardType, type CardBrand };

@@ -1,29 +1,13 @@
 import type { RandomGenerator } from "./SeededRandom";
+import { GetCardType, type CardBrand } from "./GetCardType";
 
-type CardType = "amex" | "dinersclub" | "discover" | "jcb" | "mastercard" | "unionpay" | "visa";
-
-type CardProfile = {
-  type: CardType;
-  prefixes: string[];
-  length: number;
-};
 
 type CardInfo = {
-  cardType: CardType;
+  cardBrand: CardBrand;
   prefix: string;
   imageUrl: string;
   number: string;
 };
-
-const CARD_PROFILES: CardProfile[] = [
-  { type: "visa", prefixes: ["4"], length: 16 },
-  { type: "mastercard", prefixes: ["51", "52", "53", "54", "55"], length: 16 },
-  { type: "amex", prefixes: ["34", "37"], length: 15 },
-  { type: "discover", prefixes: ["6011", "65"], length: 16 },
-  { type: "dinersclub", prefixes: ["300", "301", "302", "303", "304", "305", "36", "38"], length: 14 },
-  { type: "jcb", prefixes: ["35"], length: 16 },
-  { type: "unionpay", prefixes: ["62"], length: 16 },
-];
 
 const luhnCheckDigit = (payload: string): number => {
   const withTrailingZero = `${payload}0`;
@@ -60,10 +44,10 @@ const formatNumber = (digits: string): string => {
 };
 
 function GetCardInfo(random: RandomGenerator): CardInfo {
-  const profile = CARD_PROFILES[random.nextInt(0, CARD_PROFILES.length - 1)];
-  const prefix = profile.prefixes[random.nextInt(0, profile.prefixes.length - 1)];
+  const cardType = GetCardType(random);
+  const prefix = cardType.prefix;
 
-  const payloadLength = profile.length - 1;
+  const payloadLength = cardType.length - 1;
   const randomDigitsCount = Math.max(0, payloadLength - prefix.length);
   const randomDigits = Array.from({ length: randomDigitsCount }, () => random.nextInt(0, 9)).join("");
   const payload = `${prefix}${randomDigits}`;
@@ -72,12 +56,12 @@ function GetCardInfo(random: RandomGenerator): CardInfo {
   const number = formatNumber(`${payload}${checkDigit}`);
 
   return {
-    cardType: profile.type,
+    cardBrand: cardType.brand,
     prefix,
-    imageUrl: `/images/${profile.type}.svg`,
+    imageUrl: `/images/${cardType.brand}.svg`,
     number,
   };
 }
 
 export { GetCardInfo };
-export type { CardInfo, CardType };
+export type { CardInfo };
