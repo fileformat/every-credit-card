@@ -6,3 +6,9 @@
 .table tbody td {
 	font-family: "Chivo Mono", monospace;
 }
+
+.less-padding {
+	:where(th, td) {
+		padding: 0.25rem 0.25rem;
+	}
+}

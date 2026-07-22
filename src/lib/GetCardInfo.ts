@@ -63,5 +63,4 @@ function GetCardInfo(random: RandomGenerator): CardInfo {
   };
 }
 
-export { GetCardInfo };
-export type { CardInfo };
+export { GetCardInfo, type CardBrand };

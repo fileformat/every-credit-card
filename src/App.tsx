@@ -4,7 +4,7 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import AboutDialog from './AboutDialog'
 import './App.css'
 import { GetCardInfo } from './lib/GetCardInfo'
-import type { CardType } from './lib/GetCardInfo'
+import type { CardBrand } from './lib/GetCardInfo'
 import { GetName } from './lib/GetName'
 import { SeededRandom } from './lib/SeededRandom'
 
@@ -23,8 +23,8 @@ const subtitles = [
 
 const pad = (value: number, width: number): string => value.toString().padStart(width, '0');
 
-const getCvv = (random: ReturnType<typeof SeededRandom>, cardType: CardType): string => {
-  if (cardType === 'amex') {
+const getCvv = (random: ReturnType<typeof SeededRandom>, cardBrand: CardBrand): string => {
+  if (cardBrand === 'amex') {
     return pad(random.nextInt(0, 9999), 4);
   }
 
@@ -46,7 +46,7 @@ function App() {
   const [subtitleIndex, setSubtitleIndex] = useState(Math.floor(Math.random() * subtitles.length))
 
   const TOTAL_ROWS = 1_000_000_000_000_000;
-  const ROW_HEIGHT = 48;
+  const ROW_HEIGHT = 16;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [logicalRow, setLogicalRow] = useState(0);
@@ -124,7 +124,7 @@ function App() {
         </div>
         <div className="flex flex-1 min-h-0">
           <div ref={containerRef} className="flex-1 overflow-hidden">
-            <table className="table w-full" onWheel={handleWheel}>
+            <table className="table table-xsm w-full less-padding" onWheel={handleWheel}>
               <thead>
                 <tr>
                   {debug && <th style={{ width: '18em' }}>Debug</th>}
@@ -142,7 +142,7 @@ function App() {
                   const random = SeededRandom(row);
                   const name = GetName(random);
                   const cardInfo = GetCardInfo(random);
-                  const cvv = getCvv(random, cardInfo.cardType);
+                  const cvv = getCvv(random, cardInfo.cardBrand);
                   const zip = getZip(random);
                   const expires = getExpires(random);
 
@@ -154,13 +154,13 @@ function App() {
                           src={cardInfo.imageUrl}
                           title={cardInfo.cardBrand}
                           alt={cardInfo.cardBrand}
-                          className="inline-block h-6 w-auto"
+                          className="inline-block h-5 w-auto"
                         />
                       </td>
                       <td>{cardInfo.number}</td>
                       <td>{cvv}</td>
                       <td>{expires}</td>
-                      <td>{name}</td>
+                      <td >{name}</td>
                       <td>{zip}</td>
                     </tr>
                   );
