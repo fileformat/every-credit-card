@@ -40,6 +40,9 @@ const pickWeightedName = (random: RandomGenerator, names: WeightedName[]): strin
 const FIRST_NAMES = parseWeightedNames(firstNamesRaw);
 const LAST_NAMES = parseWeightedNames(lastNamesRaw);
 
+const FIRST_NAME_SET = new Set(FIRST_NAMES.map(n => n.name.toUpperCase()));
+const LAST_NAME_SET = new Set(LAST_NAMES.map(n => n.name.toUpperCase()));
+
 function GetName(random: RandomGenerator): string {
 	const firstName = pickWeightedName(random, FIRST_NAMES);
 	const lastName = pickWeightedName(random, LAST_NAMES);
@@ -47,4 +50,21 @@ function GetName(random: RandomGenerator): string {
 	return `${firstName} ${lastName}`;
 }
 
-export { GetName };
+/** Returns true if the query is a valid prefix of at least one "FIRST LAST" name in the dataset. */
+function nameExists(query: string): boolean {
+	const q = query.trim().toUpperCase();
+	if (!q) return false;
+	const spaceIdx = q.indexOf(' ');
+	if (spaceIdx === -1) {
+		for (const name of FIRST_NAME_SET) if (name.startsWith(q)) return true;
+		return false;
+	}
+	const firstPart = q.slice(0, spaceIdx);
+	const lastPart = q.slice(spaceIdx + 1);
+	if (!FIRST_NAME_SET.has(firstPart)) return false;
+	if (lastPart === '') return true;
+	for (const name of LAST_NAME_SET) if (name.startsWith(lastPart)) return true;
+	return false;
+}
+
+export { GetName, nameExists };

@@ -3,7 +3,7 @@ type AboutDialogProps = {
   onClose: () => void
 }
 
-function AboutDialog({ isOpen, onClose }: AboutDialogProps) {
+export function AboutDialog({ isOpen, onClose }: AboutDialogProps) {
   if (!isOpen) {
     return null
   }
@@ -42,5 +42,3 @@ function AboutDialog({ isOpen, onClose }: AboutDialogProps) {
     </dialog>
   )
 }
-
-export default AboutDialog

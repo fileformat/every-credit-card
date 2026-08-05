@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 
-import AboutDialog from './AboutDialog'
 import './App.css'
+import { AboutDialog } from './components/AboutDialog'
+import { CopyButton } from './components/CopyButton'
 import { GetCardInfo } from './lib/GetCardInfo'
 import type { CardBrand } from './lib/GetCardInfo'
-import { GetName } from './lib/GetName'
+import { GetName, nameExists } from './lib/GetName'
 import { SeededRandom } from './lib/SeededRandom'
 
 const subtitles = [
@@ -19,6 +20,7 @@ const subtitles = [
   "Because that's where the money is",
   "Buy now, pay never",
   "With no fine print!",
+  "Literally!",
 ];
 
 const pad = (value: number, width: number): string => value.toString().padStart(width, '0');
@@ -51,6 +53,58 @@ function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [logicalRow, setLogicalRow] = useState(0);
   const [containerHeight, setContainerHeight] = useState(600);
+  const [nameSearch, setNameSearch] = useState('');
+  const [showNameSearch, setShowNameSearch] = useState(false);
+  const [searchStatus, setSearchStatus] = useState<'idle' | 'searching' | 'found' | 'invalid' | 'notfound'>('idle');
+  const [activeQuery, setActiveQuery] = useState('');
+  const [foundRow, setFoundRow] = useState<number | null>(null);
+  const nameSearchRef = useRef<HTMLDivElement>(null);
+  const searchAbortRef = useRef(false);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (nameSearchRef.current && !nameSearchRef.current.contains(e.target as Node)) {
+        setShowNameSearch(false);
+      }
+    };
+    if (showNameSearch) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showNameSearch]);
+
+  const handleNameSearch = () => {
+    if (!nameExists(nameSearch)) {
+      setSearchStatus('invalid');
+      return;
+    }
+    const query = nameSearch.trim().toUpperCase();
+    // Skip the top row if it already matches, so repeated searches advance to the next hit
+    const topRow = logicalRow;
+    const skipTop = GetName(SeededRandom(topRow)).startsWith(query);
+    const startRow = skipTop ? topRow + 1 : topRow;
+    setSearchStatus('searching');
+    setActiveQuery('');
+    searchAbortRef.current = false;
+    const BATCH = 10_000;
+    const MAX = 10_000_000;
+    let start = startRow;
+    const scan = () => {
+      if (searchAbortRef.current) return;
+      const end = Math.min(start + BATCH, MAX);
+      for (let row = start; row < end; row++) {
+        if (GetName(SeededRandom(row)).startsWith(query)) {
+          setSearchStatus('found');
+          setActiveQuery(query);
+          setFoundRow(row);
+          setLogicalRow(row);
+          return;
+        }
+      }
+      start = end;
+      if (start >= MAX) { setSearchStatus('notfound'); return; }
+      setTimeout(scan, 0);
+    };
+    setTimeout(scan, 0);
+  };
 
   useEffect(() => {
     const el = containerRef.current;
@@ -109,7 +163,7 @@ function App() {
             <span className="ms-3 mt-1 text-xl font-light cursor-pointer" onClick={() => setSubtitleIndex(Math.floor(Math.random() * subtitles.length))}>{subtitles[subtitleIndex]}</span>
           </div>
           {debug && <div className="">
-            <span>Debug pos={logicalRow} vis={visibleCount}</span>
+            <span>Debug pos={logicalRow} vis={visibleCount}{foundRow !== null ? ` found=${foundRow}` : ''}</span>
           </div>}
           <div className="">
             <button
@@ -132,7 +186,41 @@ function App() {
                   <th style={{ width: '18em' }}>Card Number</th>
                   <th style={{ width: '6em' }}>CVV</th>
                   <th style={{ width: '7em' }}>Expires</th>
-                  <th style={{ width: '26em' }}>Name</th>
+                  <th style={{ width: '26em' }}>
+                    <div ref={nameSearchRef} className="inline-flex items-center gap-1">
+                      {showNameSearch ? (
+                        <>
+                          <input
+                            type="text"
+                            autoFocus
+                            placeholder="FIRST LAST"
+                            value={nameSearch}
+                            onChange={e => { setNameSearch(e.target.value); setSearchStatus('idle'); }}
+                            onKeyDown={e => { if (e.key === 'Enter') handleNameSearch(); }}
+                            className="input input-xs w-32"
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-xs btn-primary"
+                            onClick={() => handleNameSearch()}
+                            disabled={searchStatus === 'searching'}
+                          >Go</button>
+                          {searchStatus === 'searching' && <span className="text-xs opacity-60">Searching…</span>}
+                          {searchStatus === 'invalid' && <span className="text-xs text-error">Not in dataset</span>}
+                          {searchStatus === 'notfound' && <span className="text-xs text-error">Not found</span>}
+                          {searchStatus === 'found' && <span className="text-xs text-success">Found!</span>}
+                        </>
+                      ) : 'Name'}
+                      <button
+                        type="button"
+                        onClick={() => { setShowNameSearch(v => !v); setSearchStatus('idle'); }}
+                        className={`btn btn-ghost btn-xs px-0.5 ${searchStatus === 'found' ? 'text-primary' : ''}`}
+                        aria-label="Search by name"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                      </button>
+                    </div>
+                  </th>
                   <th style={{ width: '7em' }}>Zip</th>
                 </tr>
               </thead>
@@ -147,7 +235,7 @@ function App() {
                   const expires = getExpires(random);
 
                   return (
-                    <tr key={row} style={{ height: ROW_HEIGHT }}>
+                    <tr key={row} className="group" style={{ height: ROW_HEIGHT }}>
                       {debug && <td>{Intl.NumberFormat().format(row + 1)}</td>}
                       <td className="text-center text-nowrap py-0">
                         <img
@@ -157,10 +245,10 @@ function App() {
                           className="inline-block h-5 w-auto"
                         />
                       </td>
-                      <td>{cardInfo.number}</td>
-                      <td>{cvv}</td>
-                      <td>{expires}</td>
-                      <td >{name}</td>
+                      <td><span className="inline-flex items-center gap-0.5">{cardInfo.number}<CopyButton text={cardInfo.number} /></span></td>
+                      <td><span className="inline-flex items-center gap-0.5">{cvv}<CopyButton text={cvv} /></span></td>
+                      <td><span className="inline-flex items-center gap-0.5">{expires}<CopyButton text={expires} /></span></td>
+                      <td><span className="inline-flex items-center gap-0.5">{activeQuery && name.startsWith(activeQuery) ? <><mark className="bg-warning/50 rounded-sm not-italic">{name.slice(0, activeQuery.length)}</mark>{name.slice(activeQuery.length)}</> : name}<CopyButton text={name} /></span></td>
                       <td>{zip}</td>
                     </tr>
                   );
