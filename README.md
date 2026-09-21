@@ -23,3 +23,5 @@ The conversion from UUIDs to credit cards was written with Github Copilot using 
 [![TypeScript](https://www.vectorlogo.zone/logos/typescriptlang/typescriptlang-ar21.svg)](https://www.typescriptlang.org/ "Programming Language")
 [![US Census](https://www.vectorlogo.zone/logos/censusgov/censusgov-ar21.svg)](https://www.census.gov/ "Names")
 [![Vite](https://www.vectorlogo.zone/logos/vitejsdev/vitejsdev-ar21.svg)](https://vite.dev/ "Dev server")
+
+* [Charm Icons](https://github.com/jaynewey/charm-icons)
