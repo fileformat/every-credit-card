@@ -1,5 +1,6 @@
 import firstNamesRaw from "../assets/firstnames.csv?raw";
 import lastNamesRaw from "../assets/lastnames.csv?raw";
+import middleInitialsRaw from "../assets/middleinitial.csv?raw";
 
 import type { RandomGenerator } from "./SeededRandom";
 
@@ -39,6 +40,7 @@ const pickWeightedName = (random: RandomGenerator, names: WeightedName[]): strin
 
 const FIRST_NAMES = parseWeightedNames(firstNamesRaw);
 const LAST_NAMES = parseWeightedNames(lastNamesRaw);
+const MIDDLE_INITIALS = parseWeightedNames(middleInitialsRaw);
 
 const FIRST_NAME_SET = new Set(FIRST_NAMES.map(n => n.name.toUpperCase()));
 const LAST_NAME_SET = new Set(LAST_NAMES.map(n => n.name.toUpperCase()));
@@ -47,7 +49,12 @@ function GetName(random: RandomGenerator): string {
 	const firstName = pickWeightedName(random, FIRST_NAMES);
 	const lastName = pickWeightedName(random, LAST_NAMES);
 
-	return `${firstName} ${lastName}`;
+	let middleInitial = '';
+	if (random.nextFloat() < 0.35) {
+		middleInitial = pickWeightedName(random, MIDDLE_INITIALS) + " ";
+	}
+
+	return `${firstName} ${middleInitial}${lastName}`;
 }
 
 /** Returns true if the query is a valid prefix of at least one "FIRST LAST" name in the dataset. */
