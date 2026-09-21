@@ -70,6 +70,13 @@ export function NameSearchDialog({ isOpen, onClose }: NameSearchDialogProps) {
     setResult(generateResult(query, newPosition))
   }
 
+  const handleClose = () => {
+    setQuery('')
+    setPosition(0)
+    setResult(emptyResult)
+    onClose()
+  }
+
   return (
     <dialog className="modal modal-open" aria-labelledby="name-search-dialog-title">
       <div className="modal-box max-w-lg">
@@ -117,10 +124,10 @@ export function NameSearchDialog({ isOpen, onClose }: NameSearchDialogProps) {
           </div>
         </div>
         <div className="modal-action">
-          <button type="button" className="btn" onClick={onClose}>Close</button>
+          <button type="button" className="btn" onClick={handleClose}>Close</button>
         </div>
       </div>
-      <button type="button" className="modal-backdrop" aria-label="Close name search dialog" onClick={onClose}>
+      <button type="button" className="modal-backdrop" aria-label="Close name search dialog" onClick={handleClose}>
         Close
       </button>
     </dialog>

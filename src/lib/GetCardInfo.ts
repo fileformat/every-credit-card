@@ -1,5 +1,5 @@
 import type { RandomGenerator } from "./SeededRandom";
-import { GetCardType, type CardBrand } from "./GetCardType";
+import { GetCardType, CARD_TYPES, type CardBrand } from "./GetCardType";
 
 
 type CardInfo = {
@@ -30,6 +30,12 @@ const luhnCheckDigit = (payload: string): number => {
   return (10 - (sum % 10)) % 10;
 };
 
+const isValidLuhn = (digits: string): boolean => {
+  const payload = digits.slice(0, -1);
+  const checkDigit = Number(digits.slice(-1));
+  return luhnCheckDigit(payload) === checkDigit;
+};
+
 const formatNumber = (digits: string): string => {
   if (digits.length === 15) {
     return `${digits.slice(0, 4)}\u00A0${digits.slice(4, 10)}\u00A0${digits.slice(10, 15)}`;
@@ -41,6 +47,19 @@ const formatNumber = (digits: string): string => {
 
   const groups = digits.match(/.{1,4}/g);
   return groups ? groups.join("\u00A0") : digits;
+};
+
+/** Formats a (possibly partial) card number's digits for display in an editable input. */
+const formatCardNumberInput = (digits: string): string => {
+  const matchedType = CARD_TYPES.find(ct => digits.startsWith(ct.prefix));
+
+  if (matchedType && (matchedType.length === 14 || matchedType.length === 15)) {
+    const groups = [digits.slice(0, 4), digits.slice(4, 10), digits.slice(10, matchedType.length)];
+    return groups.filter(Boolean).join(" ");
+  }
+
+  const groups = digits.match(/.{1,4}/g);
+  return groups ? groups.join(" ") : digits;
 };
 
 function GetCardInfo(random: RandomGenerator): CardInfo {
@@ -63,4 +82,4 @@ function GetCardInfo(random: RandomGenerator): CardInfo {
   };
 }
 
-export { GetCardInfo, type CardBrand };
+export { GetCardInfo, isValidLuhn, formatCardNumberInput, type CardBrand };

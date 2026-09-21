@@ -45,4 +45,4 @@ function GetCardType(rng: RandomGenerator): CardType {
 }
 
 
-export { GetCardType, type CardType, type CardBrand };
+export { GetCardType, CARD_TYPES, type CardType, type CardBrand };

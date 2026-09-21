@@ -5,9 +5,11 @@ import './App.css'
 import { AboutDialog } from './components/AboutDialog'
 import { CopyButton } from './components/CopyButton'
 import { NameSearchDialog } from './components/NameSearchDialog'
+import { NumberSearchDialog } from './components/NumberSearchDialog'
 import { GetCardInfo } from './lib/GetCardInfo'
 import { getCvv, getZip, getExpires } from './lib/GetCardDetails'
 import { GetName } from './lib/GetName'
+import { rememberCard } from './lib/CopiedCardMemory'
 import { SeededRandom } from './lib/SeededRandom'
 
 const subtitles = [
@@ -28,6 +30,7 @@ function App() {
   const [debug, setDebug] = useQueryState('debug', parseAsBoolean.withDefault(false));
   const [isAboutOpen, setIsAboutOpen] = useQueryState('about', parseAsBoolean.withDefault(false));
   const [isNameSearchOpen, setIsNameSearchOpen] = useQueryState('search', parseAsBoolean.withDefault(false));
+  const [isNumberSearchOpen, setIsNumberSearchOpen] = useQueryState('numsearch', parseAsBoolean.withDefault(false));
 
   const [subtitleIndex, setSubtitleIndex] = useState(Math.floor(Math.random() * subtitles.length))
 
@@ -115,7 +118,19 @@ function App() {
                 <tr>
                   {debug && <th style={{ width: '18em' }}>Debug</th>}
                   <th className="text-center" style={{ width: '6em' }}></th>
-                  <th style={{ width: '18em' }}>Card Number</th>
+                  <th style={{ width: '18em' }}>
+                    <span className="inline-flex items-center gap-1">
+                      Card Number
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-xs px-0.5"
+                        aria-label="Search by card number"
+                        onClick={() => setIsNumberSearchOpen(true)}
+                      >
+                        <img src="/images/icons/search.svg" alt="" className="h-4 w-4" />
+                      </button>
+                    </span>
+                  </th>
                   <th style={{ width: '6em' }}>CVV</th>
                   <th style={{ width: '7em' }}>Expires</th>
                   <th style={{ width: '26em' }}>
@@ -155,7 +170,7 @@ function App() {
                           className="inline-block h-5 w-auto"
                         />
                       </td>
-                      <td><span className="inline-flex items-center gap-0.5">{cardInfo.number}<CopyButton text={cardInfo.number} /></span></td>
+                      <td><span className="inline-flex items-center gap-0.5">{cardInfo.number}<CopyButton text={cardInfo.number} onCopy={() => rememberCard(cardInfo.number.replace(/\D/g, ''), { name, cardNumber: cardInfo.number, cvv, expires, zip })} /></span></td>
                       <td><span className="inline-flex items-center gap-0.5">{cvv}<CopyButton text={cvv} /></span></td>
                       <td><span className="inline-flex items-center gap-0.5">{expires}<CopyButton text={expires} /></span></td>
                       <td><span className="inline-flex items-center gap-0.5">{name}<CopyButton text={name} /></span></td>
@@ -180,6 +195,12 @@ function App() {
       </div>
       <AboutDialog isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
       <NameSearchDialog isOpen={isNameSearchOpen} onClose={() => setIsNameSearchOpen(false)} />
+      <NumberSearchDialog
+        isOpen={isNumberSearchOpen}
+        onClose={() => setIsNumberSearchOpen(false)}
+        logicalRow={logicalRow}
+        visibleCount={visibleCount}
+      />
     </>
   )
 }
