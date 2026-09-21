@@ -4,8 +4,9 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import './App.css'
 import { AboutDialog } from './components/AboutDialog'
 import { CopyButton } from './components/CopyButton'
+import { NameSearchDialog } from './components/NameSearchDialog'
 import { GetCardInfo } from './lib/GetCardInfo'
-import type { CardBrand } from './lib/GetCardInfo'
+import { getCvv, getZip, getExpires } from './lib/GetCardDetails'
 import { GetName } from './lib/GetName'
 import { SeededRandom } from './lib/SeededRandom'
 
@@ -23,27 +24,10 @@ const subtitles = [
   "Literally!",
 ];
 
-const pad = (value: number, width: number): string => value.toString().padStart(width, '0');
-
-const getCvv = (random: ReturnType<typeof SeededRandom>, cardBrand: CardBrand): string => {
-  if (cardBrand === 'amex') {
-    return pad(random.nextInt(0, 9999), 4);
-  }
-
-  return pad(random.nextInt(0, 999), 3);
-};
-
-const getZip = (random: ReturnType<typeof SeededRandom>): string => pad(random.nextInt(0, 99999), 5);
-
-const getExpires = (random: ReturnType<typeof SeededRandom>): string => {
-  const month = pad(random.nextInt(1, 12), 2);
-  const year = random.nextInt(26, 36);
-  return `${month}/${year}`;
-};
-
 function App() {
   const [debug, setDebug] = useQueryState('debug', parseAsBoolean.withDefault(false));
   const [isAboutOpen, setIsAboutOpen] = useQueryState('about', parseAsBoolean.withDefault(false));
+  const [isNameSearchOpen, setIsNameSearchOpen] = useQueryState('search', parseAsBoolean.withDefault(false));
 
   const [subtitleIndex, setSubtitleIndex] = useState(Math.floor(Math.random() * subtitles.length))
 
@@ -134,7 +118,19 @@ function App() {
                   <th style={{ width: '18em' }}>Card Number</th>
                   <th style={{ width: '6em' }}>CVV</th>
                   <th style={{ width: '7em' }}>Expires</th>
-                  <th style={{ width: '26em' }}>Name</th>
+                  <th style={{ width: '26em' }}>
+                    <span className="inline-flex items-center gap-1">
+                      Name
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-xs px-0.5"
+                        aria-label="Search by name"
+                        onClick={() => setIsNameSearchOpen(true)}
+                      >
+                        <img src="/images/icons/search.svg" alt="" className="h-4 w-4" />
+                      </button>
+                    </span>
+                  </th>
                   <th style={{ width: '7em' }}>Zip</th>
                 </tr>
               </thead>
@@ -183,6 +179,7 @@ function App() {
         </div>
       </div>
       <AboutDialog isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+      <NameSearchDialog isOpen={isNameSearchOpen} onClose={() => setIsNameSearchOpen(false)} />
     </>
   )
 }

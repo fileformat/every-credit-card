@@ -74,4 +74,54 @@ function nameExists(query: string): boolean {
 	return false;
 }
 
-export { GetName, nameExists };
+const matchOrNull = (part: string, candidates: WeightedName[], random: RandomGenerator): string | null => {
+	const matches = candidates.filter(n => n.name.toUpperCase().startsWith(part.toUpperCase()));
+	return matches.length > 0 ? pickWeightedName(random, matches) : null;
+};
+
+const matchExactOrNull = (part: string, candidates: WeightedName[], random: RandomGenerator): string | null => {
+	const matches = candidates.filter(n => n.name.toUpperCase() === part.toUpperCase());
+	return matches.length > 0 ? pickWeightedName(random, matches) : null;
+};
+
+/** Generates a random full name that starts with the given (possibly partial) text, or null if no name in the dataset matches. */
+function GetNameStartingWith(random: RandomGenerator, query: string): string | null {
+	const withoutLeadingSpace = query.replace(/^\s+/, '');
+	if (!withoutLeadingSpace.trim()) {
+		return GetName(random);
+	}
+
+	// Any whitespace after the leading spaces means the first name was typed in full.
+	const firstNameComplete = /\s/.test(withoutLeadingSpace);
+	const words = withoutLeadingSpace.trim().split(/\s+/);
+
+	if (words.length >= 3) {
+		const firstName = matchExactOrNull(words[0], FIRST_NAMES, random);
+		const middleInitial = matchOrNull(words[1], MIDDLE_INITIALS, random);
+		const lastName = matchOrNull(words.slice(2).join(' '), LAST_NAMES, random);
+		if (!firstName || !middleInitial || !lastName) return null;
+		return `${firstName} ${middleInitial} ${lastName}`;
+	}
+
+	const [firstPart, lastPart] = words;
+	const firstName = firstNameComplete
+		? matchExactOrNull(firstPart, FIRST_NAMES, random)
+		: matchOrNull(firstPart, FIRST_NAMES, random);
+	if (!firstName) return null;
+
+	if (lastPart) {
+		const lastName = matchOrNull(lastPart, LAST_NAMES, random);
+		if (!lastName) return null;
+		return `${firstName} ${lastName}`;
+	}
+
+	const lastName = pickWeightedName(random, LAST_NAMES);
+	let middleInitial = '';
+	if (random.nextFloat() < 0.35) {
+		middleInitial = pickWeightedName(random, MIDDLE_INITIALS) + " ";
+	}
+
+	return `${firstName} ${middleInitial}${lastName}`;
+}
+
+export { GetName, nameExists, GetNameStartingWith };
