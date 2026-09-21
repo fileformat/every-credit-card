@@ -8,9 +8,7 @@ A searchable list of every credit card, just in case you need to divert focus of
 
 ## Credits
 
-This is a direct adaptation of [Nolan Royalty](http://eieio.games/)'s [Every UUID](https://everyuuid.com/) ([source](https://github.com/nolenroyalty/every-uuid)).  All credit for the idea, design and original code is theirs.
-
-The conversion from UUIDs to credit cards was written with Github Copilot using GPT-5.3-Codex.
+Written with Github Copilot using various models including Claude Sonnet and GPT-5.3-Codex.
 
 [![DaisyUI](https://www.vectorlogo.zone/logos/daisyui/daisyui-ar21.svg)](https://daisyui.com/ "HTML/CSS Framework")
 [![Git](https://www.vectorlogo.zone/logos/git-scm/git-scm-ar21.svg)](https://git-scm.com/ "Version control")
@@ -25,3 +23,4 @@ The conversion from UUIDs to credit cards was written with Github Copilot using 
 [![Vite](https://www.vectorlogo.zone/logos/vitejsdev/vitejsdev-ar21.svg)](https://vite.dev/ "Dev server")
 
 * [Charm Icons](https://github.com/jaynewey/charm-icons)
+* [Every UUID](https://everyuuid.com/) by [Nolan Royalty](http://eieio.games/) ([source](https://github.com/nolenroyalty/every-uuid)) - inspiration.  An initial version used a lot of his code, but the current version is mostly (maybe completely?) original.
