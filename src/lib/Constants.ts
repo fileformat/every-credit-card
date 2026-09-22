@@ -1,0 +1,3 @@
+const TOTAL_ROWS = 1_000_000_000_000_000;
+
+export { TOTAL_ROWS };

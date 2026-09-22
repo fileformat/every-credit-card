@@ -11,6 +11,7 @@ import { getCvv, getZip, getExpires } from './lib/GetCardDetails'
 import { GetName } from './lib/GetName'
 import { rememberCard } from './lib/CopiedCardMemory'
 import { SeededRandom } from './lib/SeededRandom'
+import { TOTAL_ROWS } from './lib/Constants'
 
 const subtitles = [
   "PCI Audit: Fail",
@@ -34,7 +35,6 @@ function App() {
 
   const [subtitleIndex, setSubtitleIndex] = useState(Math.floor(Math.random() * subtitles.length))
 
-  const TOTAL_ROWS = 1_000_000_000_000_000;
   const ROW_HEIGHT = 16;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -153,8 +153,8 @@ function App() {
                 {Array.from({ length: visibleCount }, (_, i) => {
                   const row = logicalRow + i;
                   const random = SeededRandom(row);
-                  const name = GetName(random);
                   const cardInfo = GetCardInfo(random);
+                  const name = GetName(random);
                   const cvv = getCvv(random, cardInfo.cardBrand);
                   const zip = getZip(random);
                   const expires = getExpires(random);

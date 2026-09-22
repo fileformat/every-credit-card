@@ -6,6 +6,7 @@ import { GetName } from '../lib/GetName'
 import { SeededRandom } from '../lib/SeededRandom'
 import { findRememberedCard } from '../lib/CopiedCardMemory'
 import { validateCardNumber } from '../lib/ValidateCardNumber'
+import { TOTAL_ROWS } from '../lib/Constants'
 
 type NumberSearchDialogProps = {
   isOpen: boolean
@@ -26,20 +27,43 @@ type DonationStatus = 'idle' | 'submitting' | 'processing' | 'thanks'
 
 const emptyResult: SearchResult = { name: '', cardNumber: '', cvv: '', expires: '', zip: '' }
 
-/** Searches the currently displayed rows for a card number matching the given digits. */
-const findResultInDisplayedRows = (digits: string, logicalRow: number, visibleCount: number): SearchResult | null => {
-  for (let i = 0; i < visibleCount; i++) {
-    const row = logicalRow + i
-    const random = SeededRandom(row)
-    const name = GetName(random)
-    const cardInfo = GetCardInfo(random)
-    const cvv = getCvv(random, cardInfo.cardBrand)
-    const expires = getExpires(random)
-    const zip = getZip(random)
+const SEARCH_WINDOW = 100
+const EDGE_SEARCH_COUNT = 50
 
-    if (cardInfo.number.replace(/\D/g, '') === digits) {
-      return { name, cardNumber: cardInfo.number, cvv, expires, zip }
+const getRowResultIfMatches = (row: number, digits: string): SearchResult | null => {
+  const random = SeededRandom(row)
+  const cardInfo = GetCardInfo(random)
+  if (cardInfo.number.replace(/\D/g, '') !== digits) {
+    return null;
+  }
+  const name = GetName(random)
+  const cvv = getCvv(random, cardInfo.cardBrand)
+  const expires = getExpires(random)
+  const zip = getZip(random)
+
+  return { name, cardNumber: cardInfo.number, cvv, expires, zip };
+}
+
+/** Searches a wide window around the currently displayed rows, plus the first and last rows of the whole range. */
+const findResultInDisplayedRows = (digits: string, logicalRow: number, visibleCount: number): SearchResult | null => {
+  const windowStart = Math.max(0, logicalRow - SEARCH_WINDOW)
+  const windowEnd = Math.min(TOTAL_ROWS, logicalRow + Math.max(visibleCount, SEARCH_WINDOW))
+
+  for (let row = windowStart; row < windowEnd; row++) {
+    const found = getRowResultIfMatches(row, digits)
+    if (found) return found
+  }
+
+  if (windowStart > 0) {
+    for (let row = 0; row < Math.min(EDGE_SEARCH_COUNT, TOTAL_ROWS); row++) {
+      const found = getRowResultIfMatches(row, digits)
+      if (found) return found
     }
+  }
+
+  for (let row = Math.max(0, TOTAL_ROWS - EDGE_SEARCH_COUNT); row < TOTAL_ROWS; row++) {
+    const found = getRowResultIfMatches(row, digits)
+    if (found) return found
   }
 
   return null
