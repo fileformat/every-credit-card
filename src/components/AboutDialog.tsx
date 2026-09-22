@@ -29,8 +29,14 @@ export function AboutDialog({ isOpen, onClose }: AboutDialogProps) {
           <p>
             Check out the{' '}
             <a className="link link-primary" href="https://github.com/fileformat/every-credit-card">
-               source
+              source
             </a> and <a className="link link-primary" href="https://github.com/fileformat/every-credit-card#credits">credits</a>.  Contributions welcome!
+          </p>
+          <p>
+            And I'm looking for work!  Check out my{' '}
+            <a className="link link-primary" href="https://andrew.marcuse.info/resume/">
+              résumé
+            </a> and <a className="link link-primary" href="https://andrew.marcuse.info/contact.html">get in touch</a>!
           </p>
         </div>
         <div className="modal-action">
