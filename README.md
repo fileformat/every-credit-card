@@ -4,7 +4,7 @@ A searchable list of every credit card, just in case you need to divert focus of
 
 ## License
 
-[MIT](LICENSE.txt)
+[AGPL-3.0-or-later](LICENSE.txt)
 
 ## Credits
 
@@ -24,3 +24,13 @@ Written with Github Copilot using various models including Claude Sonnet and GPT
 
 * [Charm Icons](https://github.com/jaynewey/charm-icons)
 * [Every UUID](https://everyuuid.com/) by [Nolan Royalty](http://eieio.games/) ([source](https://github.com/nolenroyalty/every-uuid)) - inspiration.  An initial version used a lot of his code, but the current version is mostly (maybe completely?) original.
+
+## To Do
+
+- [ ] better scroll bar
+- [ ] city/state for zip code
+- [ ] custom rows for specific names that aren't in the census data
+- [ ] responsive: hide card type
+- [ ] responsive: hide most, pop-up with full details
+- [ ] non-US name sources
+- [ ] non-US addresses
