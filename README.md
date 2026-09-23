@@ -27,8 +27,12 @@ Written with Github Copilot using various models including Claude Sonnet and GPT
 
 ## To Do
 
-- [ ] better scroll bar
+- [ ] better scroll bar (make into component with multiple implmentations)
 - [ ] swipe to scroll on mobile
+- [ ] scroll bar is visible when dialogs are open
+- [ ] number search flicker
+- [ ] number search: read-only input during/after donation
+- [ ] weighted distribution for expiration year
 - [ ] city/state for zip code
 - [ ] custom rows for specific names that aren't in the census data
 - [ ] embedded list of rows for common test cards
@@ -36,3 +40,4 @@ Written with Github Copilot using various models including Claude Sonnet and GPT
 - [ ] responsive: hide most, pop-up with full details
 - [ ] non-US name sources
 - [ ] non-US addresses
+- [ ] smoother scrolling (if possible?)
