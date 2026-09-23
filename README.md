@@ -28,8 +28,10 @@ Written with Github Copilot using various models including Claude Sonnet and GPT
 ## To Do
 
 - [ ] better scroll bar
+- [ ] swipe to scroll on mobile
 - [ ] city/state for zip code
 - [ ] custom rows for specific names that aren't in the census data
+- [ ] embedded list of rows for common test cards
 - [ ] responsive: hide card type
 - [ ] responsive: hide most, pop-up with full details
 - [ ] non-US name sources

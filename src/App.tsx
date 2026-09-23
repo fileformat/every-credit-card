@@ -33,7 +33,7 @@ function App() {
   const [isNameSearchOpen, setIsNameSearchOpen] = useQueryState('search', parseAsBoolean.withDefault(false));
   const [isNumberSearchOpen, setIsNumberSearchOpen] = useQueryState('numsearch', parseAsBoolean.withDefault(false));
 
-  const [subtitleIndex, setSubtitleIndex] = useState(Math.floor(Math.random() * subtitles.length))
+  const [subtitleIndex, setSubtitleIndex] = useState(() => Math.floor(Math.random() * subtitles.length))
 
   const ROW_HEIGHT = 16;
 
