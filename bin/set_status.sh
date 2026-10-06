@@ -30,7 +30,7 @@ COMMIT=$(git -C "${BASE_DIR}" rev-parse --short HEAD)
 
 echo "INFO: updating status file ${STATUS_FILE}"
 
-echo "{}" | jq \
+echo '{"success":true,"message":"OK"}' | jq \
 	--arg lastmod "${LASTMOD}" \
 	--arg tech "${TECH}" \
 	--arg commit "${COMMIT}" \
